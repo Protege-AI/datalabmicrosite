@@ -1,80 +1,57 @@
-import { getResearchProjects } from '@/lib/notion';
+import { getPublications, getResearchProjects } from '@/lib/notion';
 
 export const revalidate = 60;
 
 export default async function ResearchPage() {
-  const projects = await getResearchProjects().catch(() => []);
+  const [publications, projects] = await Promise.all([
+    getPublications().catch(() => []),
+    getResearchProjects().catch(() => []),
+  ]);
 
   // Placeholder data if no Notion data
-  const showPlaceholder = projects.length === 0;
-  const placeholderProjects = [
-    {
-      id: '1',
-      title: 'Scalable Data Pipeline Infrastructure',
-      description: 'Building next-generation data processing systems that can handle petabyte-scale data with low latency and high reliability.',
-      status: 'Active',
-      team: 'Dr. Jane Smith, Alex Johnson',
-      tags: ['Data Systems', 'Distributed Computing'],
-      order: 0,
-    },
-    {
-      id: '2',
-      title: 'ML-Powered Data Quality',
-      description: 'Developing machine learning techniques to automatically detect, diagnose, and repair data quality issues at scale.',
-      status: 'Active',
-      team: 'Dr. Jane Smith, Maria Garcia',
-      tags: ['Machine Learning', 'Data Quality'],
-      order: 1,
-    },
-    {
-      id: '3',
-      title: 'Interactive Data Visualization',
-      description: 'Creating intuitive and responsive visualization tools for exploring complex datasets.',
-      status: 'Active',
-      team: 'David Chen',
-      tags: ['Visualization', 'HCI'],
-      order: 2,
-    },
+  const showPlaceholderPubs = publications.length === 0;
+  const showPlaceholderProjects = projects.length === 0;
+
+  const placeholderPubs = [
+    { id: '1', title: 'Efficient Data Pipeline Orchestration at Scale', authors: 'A. Johnson, J. Smith', venue: 'ICML 2025', year: 2025, paperUrl: '#', codeUrl: '#' },
+    { id: '2', title: 'Learning to Detect Data Quality Issues', authors: 'M. Garcia, J. Smith', venue: 'NeurIPS 2024', year: 2024, paperUrl: '#', codeUrl: '#' },
   ];
 
-  const displayProjects = showPlaceholder ? placeholderProjects : projects;
+  const placeholderProjects = [
+    { id: '1', title: 'Scalable Data Pipeline Infrastructure', description: 'Building next-generation data processing systems.', status: 'Active', tags: ['Data Systems'], team: '', order: 0 },
+    { id: '2', title: 'ML-Powered Data Quality', description: 'Machine learning techniques for data quality at scale.', status: 'Active', tags: ['Machine Learning'], team: '', order: 1 },
+  ];
 
-  // Get unique tags for research areas
-  const allTags = [...new Set(displayProjects.flatMap((p) => p.tags))];
-  const researchAreas = allTags.length > 0 ? allTags : ['Data Systems', 'Machine Learning', 'Visualization & HCI'];
+  const displayPubs = showPlaceholderPubs ? placeholderPubs : publications;
+  const displayProjects = showPlaceholderProjects ? placeholderProjects : projects;
+
+  // Group publications by year
+  const pubsByYear = displayPubs.reduce((acc, pub) => {
+    const year = pub.year.toString();
+    if (!acc[year]) acc[year] = [];
+    acc[year].push(pub);
+    return acc;
+  }, {} as Record<string, typeof displayPubs>);
+
+  const years = Object.keys(pubsByYear).sort((a, b) => parseInt(b) - parseInt(a));
 
   return (
     <div className="py-16">
       <div className="mx-auto max-w-6xl px-6">
         <h1 className="text-4xl font-bold text-gray-900">Research</h1>
-        <p className="mt-4 text-lg text-gray-600 max-w-3xl">
-          Our research spans data infrastructure, machine learning, and human-computer
-          interaction. We aim to solve fundamental challenges in how we store, process,
-          and understand data at scale.
+        <p className="mt-4 text-lg text-gray-600">
+          Publications, working papers, and ongoing research projects from Protege Data Lab.
         </p>
 
-        {showPlaceholder && (
-          <p className="mt-4 text-sm text-gray-500 italic">
-            Add research projects in Notion to see them here.
-          </p>
-        )}
-
-        {/* Research Areas */}
+        {/* Research Projects */}
         <section className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-900">Research Areas</h2>
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-            {researchAreas.slice(0, 6).map((area) => (
-              <div key={area} className="rounded-lg bg-blue-50 p-4 text-center">
-                <span className="text-lg font-semibold text-blue-900">{area}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Projects */}
-        <section className="mt-16">
-          <h2 className="text-2xl font-bold text-gray-900">Projects</h2>
-          <div className="mt-6 space-y-8">
+          <h2 className="text-2xl font-bold text-gray-900">Research Projects</h2>
+          {showPlaceholderProjects && (
+            <p className="mt-2 text-sm text-gray-500 italic">
+              Add research projects in Notion to see them here.
+            </p>
+          )}
+          <div className="mt-6 space-y-6">
             {displayProjects.map((project) => (
               <div key={project.id} className="rounded-lg border border-gray-200 bg-white p-6">
                 <div className="flex items-start justify-between">
@@ -108,6 +85,56 @@ export default async function ResearchPage() {
                     <span className="text-sm text-gray-700">{project.team}</span>
                   </div>
                 )}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Publications */}
+        <section className="mt-16">
+          <h2 className="text-2xl font-bold text-gray-900">Publications</h2>
+          {showPlaceholderPubs && (
+            <p className="mt-2 text-sm text-gray-500 italic">
+              Add publications in Notion to see them here.
+            </p>
+          )}
+          <div className="mt-6 space-y-10">
+            {years.map((year) => (
+              <div key={year}>
+                <h3 className="text-xl font-bold text-gray-900 border-b border-gray-200 pb-2">
+                  {year}
+                </h3>
+                <ul className="mt-4 space-y-6">
+                  {pubsByYear[year].map((paper) => (
+                    <li key={paper.id} className="border-l-2 border-blue-200 pl-4">
+                      <h4 className="text-lg font-semibold text-gray-900">{paper.title}</h4>
+                      <p className="mt-1 text-gray-600">{paper.authors}</p>
+                      <p className="text-sm font-medium text-blue-600">{paper.venue}</p>
+                      <div className="mt-2 flex gap-4">
+                        {paper.paperUrl && (
+                          <a
+                            href={paper.paperUrl}
+                            className="text-sm text-gray-500 hover:text-blue-600"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            [Paper]
+                          </a>
+                        )}
+                        {paper.codeUrl && (
+                          <a
+                            href={paper.codeUrl}
+                            className="text-sm text-gray-500 hover:text-blue-600"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            [Code]
+                          </a>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>

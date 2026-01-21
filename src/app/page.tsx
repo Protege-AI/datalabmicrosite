@@ -94,6 +94,14 @@ export default async function Home() {
               Add news items in Notion to see them here.
             </p>
           )}
+          <div className="mt-6">
+            <Link
+              href="/blog"
+              className="text-sm font-medium text-blue-600 hover:text-blue-500"
+            >
+              View all news →
+            </Link>
+          </div>
         </div>
       </section>
 
