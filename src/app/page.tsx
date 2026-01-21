@@ -40,19 +40,20 @@ export default async function Home() {
       <section className="border-b border-[var(--cloud)] py-20">
         <div className="mx-auto max-w-5xl px-6">
           <h1 className="text-4xl tracking-tight text-[var(--black)] sm:text-5xl">
-            Protege Data Lab
+            Welcome to the Protege Data Lab
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-[var(--muted)] font-light leading-relaxed">
-            We conduct cutting-edge research in data science, machine learning, and
-            data infrastructure. Our mission is to advance the field through innovative
-            research and train the next generation of data scientists.
+            We are a team of research scientists committed to tackling the fundamental
+            challenges and open questions regarding data for AI. We're committed to
+            bridging the gap between research theory and data deployment to push the
+            frontier forward.
           </p>
           <div className="mt-8 flex gap-3">
             <Link
-              href="/research"
+              href="/about"
               className="border border-[var(--black)] bg-[var(--black)] px-5 py-2.5 text-xs font-mono uppercase tracking-wide text-white hover:bg-[var(--pro-indigo)] hover:border-[var(--pro-indigo)] transition-colors"
             >
-              Research
+              Learn More
             </Link>
             <Link
               href="/contact"
