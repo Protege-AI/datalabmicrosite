@@ -70,7 +70,11 @@ export default async function Home() {
           <h2 className="text-3xl font-bold text-gray-900">Latest News</h2>
           <div className="mt-8 space-y-6">
             {displayNews.map((item) => (
-              <div key={item.id} className="border-l-4 border-blue-600 pl-4">
+              <Link
+                key={item.id}
+                href={`/news/${item.id}`}
+                className="block border-l-4 border-blue-600 pl-4 hover:bg-gray-50 -ml-4 pl-8 py-2 transition-colors"
+              >
                 <div className="flex items-center gap-2 text-sm">
                   <span className="font-medium text-blue-600">{formatDate(item.date)}</span>
                   {item.author && (
@@ -82,7 +86,7 @@ export default async function Home() {
                 </div>
                 <h3 className="mt-1 text-lg font-semibold text-gray-900">{item.title}</h3>
                 <p className="mt-1 text-gray-600">{item.description}</p>
-              </div>
+              </Link>
             ))}
           </div>
           {news.length === 0 && (

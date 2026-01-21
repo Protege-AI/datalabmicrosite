@@ -73,6 +73,32 @@ async function getPage(pageId: string): Promise<any> {
   return await (notion as any).pages.retrieve({ page_id: pageId });
 }
 
+// Get page blocks (content)
+async function getBlocks(blockId: string): Promise<any[]> {
+  const blocks: any[] = [];
+  let cursor: string | undefined;
+
+  do {
+    const response: any = await (notion as any).blocks.children.list({
+      block_id: blockId,
+      start_cursor: cursor,
+      page_size: 100,
+    });
+    blocks.push(...response.results);
+    cursor = response.has_more ? response.next_cursor : undefined;
+  } while (cursor);
+
+  return blocks;
+}
+
+// Content block type
+export interface ContentBlock {
+  id: string;
+  type: string;
+  content: string;
+  children?: ContentBlock[];
+}
+
 // Fetch News
 export async function getNews(): Promise<NewsItem[]> {
   const response = await queryDatabase(
@@ -110,6 +136,93 @@ export async function getNews(): Promise<NewsItem[]> {
   );
 
   return newsItems;
+}
+
+// Fetch single news article with content
+export async function getNewsArticle(id: string): Promise<(NewsItem & { content: ContentBlock[] }) | null> {
+  try {
+    const page = await getPage(id);
+
+    // Check if published
+    if (!page.properties.Published?.checkbox) {
+      return null;
+    }
+
+    // Get author
+    const authorRelation = page.properties.Author?.relation;
+    let author: { id: string; name: string } | undefined;
+    if (authorRelation && authorRelation.length > 0) {
+      try {
+        const authorPage = await getPage(authorRelation[0].id);
+        author = {
+          id: authorPage.id,
+          name: getRichText(authorPage.properties.Name?.title),
+        };
+      } catch {
+        // Author fetch failed
+      }
+    }
+
+    // Get page content blocks
+    const blocks = await getBlocks(id);
+    const content = parseBlocks(blocks);
+
+    return {
+      id: page.id,
+      title: getRichText(page.properties.Title?.title),
+      date: page.properties.Date?.date?.start || '',
+      description: getRichText(page.properties.Description?.rich_text),
+      author,
+      content,
+    };
+  } catch {
+    return null;
+  }
+}
+
+// Parse Notion blocks to simpler format
+function parseBlocks(blocks: any[]): ContentBlock[] {
+  return blocks.map((block) => {
+    let content = '';
+
+    switch (block.type) {
+      case 'paragraph':
+        content = getRichText(block.paragraph?.rich_text);
+        break;
+      case 'heading_1':
+        content = getRichText(block.heading_1?.rich_text);
+        break;
+      case 'heading_2':
+        content = getRichText(block.heading_2?.rich_text);
+        break;
+      case 'heading_3':
+        content = getRichText(block.heading_3?.rich_text);
+        break;
+      case 'bulleted_list_item':
+        content = getRichText(block.bulleted_list_item?.rich_text);
+        break;
+      case 'numbered_list_item':
+        content = getRichText(block.numbered_list_item?.rich_text);
+        break;
+      case 'quote':
+        content = getRichText(block.quote?.rich_text);
+        break;
+      case 'callout':
+        content = getRichText(block.callout?.rich_text);
+        break;
+      case 'divider':
+        content = '---';
+        break;
+      default:
+        content = '';
+    }
+
+    return {
+      id: block.id,
+      type: block.type,
+      content,
+    };
+  }).filter(block => block.content || block.type === 'divider');
 }
 
 // Fetch People
