@@ -63,6 +63,8 @@ export interface Person {
   bio: string;
   email?: string;
   website?: string;
+  linkedin?: string;
+  twitter?: string;
   year?: string;
   currentPosition?: string;
   order: number;
@@ -272,7 +274,9 @@ export async function getPeople(): Promise<Person[]> {
     role: page.properties.Role?.select?.name || getRichText(page.properties.Role?.rich_text) || '',
     bio: getRichText(page.properties.Bio?.rich_text),
     email: page.properties.Email?.email || undefined,
-    website: page.properties.Website?.url || undefined,
+    website: page.properties.Website?.url || page.properties['Website URL']?.url || undefined,
+    linkedin: page.properties.LinkedIn?.url || page.properties['LinkedIn URL']?.url || undefined,
+    twitter: page.properties.X?.url || page.properties['X URL']?.url || undefined,
     year: getRichText(page.properties.Year?.rich_text) || undefined,
     currentPosition: getRichText(page.properties['Current Position']?.rich_text) || undefined,
     order: page.properties.Order?.number || 0,
