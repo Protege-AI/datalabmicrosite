@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { getNews } from '@/lib/notion';
 
 export const revalidate = 60;
@@ -26,8 +27,21 @@ export default async function BlogPage() {
   return (
     <div className="py-16">
       <div className="mx-auto max-w-5xl px-6">
-        <h1 className="text-3xl tracking-tight text-[var(--black)]">Blog</h1>
-        <p className="mt-3 text-[var(--muted)] font-light">
+        {/* Header with image */}
+        <div className="relative h-48 mb-10 overflow-hidden border border-[var(--cloud)]">
+          <Image
+            src="/images/photography-collage.png"
+            alt="Research and collaboration"
+            fill
+            className="object-cover object-[50%_75%]"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+          <div className="absolute bottom-0 left-0 p-6">
+            <h1 className="text-3xl tracking-tight text-white">Blog</h1>
+          </div>
+        </div>
+        <p className="text-[var(--muted)] font-light">
           News, insights, and updates from Protege Data Lab.
         </p>
 

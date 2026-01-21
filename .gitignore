@@ -47,3 +47,6 @@ Terminal Saved Output.txt
 
 # source font files (only public/fonts needed for deployment)
 /fonts/
+
+# source photo assets (only public/images needed for deployment)
+photo assets/

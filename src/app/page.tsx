@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { getNews, getResearchProjects } from '@/lib/notion';
 
 // Revalidate every 60 seconds
@@ -39,28 +40,41 @@ export default async function Home() {
       {/* Hero Section */}
       <section className="border-b border-[var(--cloud)] py-20">
         <div className="mx-auto max-w-5xl px-6">
-          <h1 className="text-4xl tracking-tight text-[var(--black)] sm:text-5xl">
-            Welcome to the Protege Data Lab
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg text-[var(--muted)] font-light leading-relaxed">
-            We are a team of research scientists committed to tackling the fundamental
-            challenges and open questions regarding data for AI. We're committed to
-            bridging the gap between research theory and data deployment to push the
-            frontier forward.
-          </p>
-          <div className="mt-8 flex gap-3">
-            <Link
-              href="/about"
-              className="border border-[var(--black)] bg-[var(--black)] px-5 py-2.5 text-xs font-mono uppercase tracking-wide text-white hover:bg-[var(--pro-indigo)] hover:border-[var(--pro-indigo)] transition-colors"
-            >
-              Learn More
-            </Link>
-            <Link
-              href="/contact"
-              className="border border-[var(--cloud)] px-5 py-2.5 text-xs font-mono uppercase tracking-wide text-[var(--muted)] hover:border-[var(--pro-indigo)] hover:text-[var(--pro-indigo)] transition-colors"
-            >
-              Join Us
-            </Link>
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+            <div>
+              <h1 className="text-4xl tracking-tight text-[var(--black)] sm:text-5xl">
+                Welcome to the Protege Data Lab
+              </h1>
+              <p className="mt-6 text-lg text-[var(--muted)] font-light leading-relaxed">
+                We are a team of research scientists committed to tackling the fundamental
+                challenges and open questions regarding data for AI. We're committed to
+                bridging the gap between research theory and data deployment to push the
+                frontier forward.
+              </p>
+              <div className="mt-8 flex gap-3">
+                <Link
+                  href="/about"
+                  className="border border-[var(--black)] bg-[var(--black)] px-5 py-2.5 text-xs font-mono uppercase tracking-wide text-white hover:bg-[var(--pro-indigo)] hover:border-[var(--pro-indigo)] transition-colors"
+                >
+                  Learn More
+                </Link>
+                <Link
+                  href="/contact"
+                  className="border border-[var(--cloud)] px-5 py-2.5 text-xs font-mono uppercase tracking-wide text-[var(--muted)] hover:border-[var(--pro-indigo)] hover:text-[var(--pro-indigo)] transition-colors"
+                >
+                  Join Us
+                </Link>
+              </div>
+            </div>
+            <div className="relative h-64 lg:h-80 overflow-hidden border border-[var(--cloud)]">
+              <Image
+                src="/images/data-visualization.png"
+                alt="Data visualization showing AI model comparisons"
+                fill
+                className="object-cover object-left"
+                priority
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -106,6 +120,17 @@ export default async function Home() {
       <section className="border-t border-[var(--cloud)] py-16">
         <div className="mx-auto max-w-5xl px-6">
           <h2 className="text-2xl font-mono uppercase tracking-wide text-[var(--purple)] mb-8">Research</h2>
+
+          {/* Pixelated Data Imagery */}
+          <div className="relative h-32 mb-8 overflow-hidden border border-[var(--cloud)]">
+            <Image
+              src="/images/pixelated-data.png"
+              alt="Pixelated data imagery representing Healthcare, Biology, and Audio & Speech domains"
+              fill
+              className="object-cover object-center"
+            />
+          </div>
+
           <div className="grid gap-6 md:grid-cols-3">
             {displayResearch.map((item) => (
               <div key={item.id} className="group border border-[var(--cloud)] p-5 hover:border-[var(--purple)]/30 transition-colors">

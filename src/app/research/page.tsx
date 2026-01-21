@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { getPublications, getResearchProjects } from '@/lib/notion';
 
 export const revalidate = 60;
@@ -38,13 +39,27 @@ export default async function ResearchPage() {
   return (
     <div className="py-16">
       <div className="mx-auto max-w-5xl px-6">
-        <h1 className="text-3xl tracking-tight text-[var(--black)]">Research</h1>
-        <p className="mt-3 text-[var(--muted)] font-light">
-          Publications, working papers, and ongoing research projects.
-        </p>
+        {/* Header with illustration */}
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-center mb-14">
+          <div>
+            <h1 className="text-3xl tracking-tight text-[var(--black)]">Research</h1>
+            <p className="mt-3 text-[var(--muted)] font-light">
+              Publications, working papers, and ongoing research projects.
+            </p>
+          </div>
+          <div className="relative h-48 overflow-hidden border border-[var(--cloud)]">
+            <Image
+              src="/images/illustrations.png"
+              alt="Abstract illustrations"
+              fill
+              className="object-cover object-[0%_0%]"
+              priority
+            />
+          </div>
+        </div>
 
         {/* Research Projects */}
-        <section className="mt-14">
+        <section>
           <h2 className="text-xs font-mono uppercase tracking-wide text-[var(--muted)] mb-6">Projects</h2>
           {showPlaceholderProjects && (
             <p className="mb-4 font-mono text-sm text-[var(--muted)]">
