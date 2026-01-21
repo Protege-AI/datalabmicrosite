@@ -1,14 +1,43 @@
 import { Client } from '@notionhq/client';
 
-const notion = new Client({
-  auth: process.env.NOTION_TOKEN,
-});
+// Lazy initialization to ensure environment variables are loaded
+let notionClient: Client | null = null;
 
-// Database IDs
-const NEWS_DB = process.env.NOTION_NEWS_DB!;
-const PEOPLE_DB = process.env.NOTION_PEOPLE_DB!;
-const PUBLICATIONS_DB = process.env.NOTION_PUBLICATIONS_DB!;
-const RESEARCH_DB = process.env.NOTION_RESEARCH_DB!;
+function getNotionClient(): Client {
+  if (!notionClient) {
+    const token = process.env.NOTION_TOKEN;
+    if (!token) {
+      throw new Error('NOTION_TOKEN environment variable is not set');
+    }
+    notionClient = new Client({ auth: token });
+  }
+  return notionClient;
+}
+
+// Database IDs - accessed lazily
+function getNewsDb(): string {
+  const db = process.env.NOTION_NEWS_DB;
+  if (!db) throw new Error('NOTION_NEWS_DB environment variable is not set');
+  return db;
+}
+
+function getPeopleDb(): string {
+  const db = process.env.NOTION_PEOPLE_DB;
+  if (!db) throw new Error('NOTION_PEOPLE_DB environment variable is not set');
+  return db;
+}
+
+function getPublicationsDb(): string {
+  const db = process.env.NOTION_PUBLICATIONS_DB;
+  if (!db) throw new Error('NOTION_PUBLICATIONS_DB environment variable is not set');
+  return db;
+}
+
+function getResearchDb(): string {
+  const db = process.env.NOTION_RESEARCH_DB;
+  if (!db) throw new Error('NOTION_RESEARCH_DB environment variable is not set');
+  return db;
+}
 
 // Helper to extract text from rich text
 function getRichText(richText: any[]): string {
@@ -59,33 +88,37 @@ export interface ResearchProject {
   order: number;
 }
 
-// Query helper
+// Query helper - using type assertion due to incomplete SDK types
 async function queryDatabase(databaseId: string, filter?: any, sorts?: any[]): Promise<any> {
-  return await (notion as any).databases.query({
+  const notion = getNotionClient() as any;
+  const response = await notion.databases.query({
     database_id: databaseId,
     filter,
     sorts,
   });
+  return response;
 }
 
 // Get page by ID
 async function getPage(pageId: string): Promise<any> {
-  return await (notion as any).pages.retrieve({ page_id: pageId });
+  const notion = getNotionClient();
+  return await notion.pages.retrieve({ page_id: pageId });
 }
 
 // Get page blocks (content)
 async function getBlocks(blockId: string): Promise<any[]> {
+  const notion = getNotionClient();
   const blocks: any[] = [];
   let cursor: string | undefined;
 
   do {
-    const response: any = await (notion as any).blocks.children.list({
+    const response = await notion.blocks.children.list({
       block_id: blockId,
       start_cursor: cursor,
       page_size: 100,
     });
     blocks.push(...response.results);
-    cursor = response.has_more ? response.next_cursor : undefined;
+    cursor = response.has_more ? (response.next_cursor ?? undefined) : undefined;
   } while (cursor);
 
   return blocks;
@@ -102,7 +135,7 @@ export interface ContentBlock {
 // Fetch News
 export async function getNews(): Promise<NewsItem[]> {
   const response = await queryDatabase(
-    NEWS_DB,
+    getNewsDb(),
     { property: 'Published', checkbox: { equals: true } },
     [{ property: 'Date', direction: 'descending' }]
   );
@@ -228,7 +261,7 @@ function parseBlocks(blocks: any[]): ContentBlock[] {
 // Fetch People
 export async function getPeople(): Promise<Person[]> {
   const response = await queryDatabase(
-    PEOPLE_DB,
+    getPeopleDb(),
     { property: 'Published', checkbox: { equals: true } },
     [{ property: 'Order', direction: 'ascending' }]
   );
@@ -249,7 +282,7 @@ export async function getPeople(): Promise<Person[]> {
 // Fetch Publications
 export async function getPublications(): Promise<Publication[]> {
   const response = await queryDatabase(
-    PUBLICATIONS_DB,
+    getPublicationsDb(),
     { property: 'Published', checkbox: { equals: true } },
     [{ property: 'Year', direction: 'descending' }]
   );
@@ -268,7 +301,7 @@ export async function getPublications(): Promise<Publication[]> {
 // Fetch Research Projects
 export async function getResearchProjects(): Promise<ResearchProject[]> {
   const response = await queryDatabase(
-    RESEARCH_DB,
+    getResearchDb(),
     { property: 'Published', checkbox: { equals: true } },
     [{ property: 'Order', direction: 'ascending' }]
   );

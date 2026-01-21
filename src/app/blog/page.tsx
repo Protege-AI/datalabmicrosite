@@ -4,7 +4,10 @@ import { getNews } from '@/lib/notion';
 export const revalidate = 60;
 
 export default async function BlogPage() {
-  const articles = await getNews().catch(() => []);
+  const articles = await getNews().catch((error) => {
+    console.error('Error fetching news:', error);
+    return [];
+  });
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return '';
