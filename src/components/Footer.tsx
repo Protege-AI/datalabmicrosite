@@ -14,6 +14,7 @@ export default function Footer() {
           <div>
             <h4 className="font-mono text-xs uppercase tracking-wide text-neutral-900">Links</h4>
             <ul className="mt-3 space-y-2">
+              <li><Link href="/about" className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors">About</Link></li>
               <li><Link href="/people" className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors">People</Link></li>
               <li><Link href="/blog" className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors">Blog</Link></li>
               <li><Link href="/research" className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors">Research</Link></li>
