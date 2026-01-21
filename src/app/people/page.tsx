@@ -103,7 +103,7 @@ export default async function PeoplePage() {
       <div className="mx-auto max-w-5xl px-6">
         <h1 className="text-3xl tracking-tight text-[var(--black)]">People</h1>
         <p className="mt-3 text-[var(--muted)] font-light">
-          Meet the team at Protege Data Lab.
+          We are a team of research scientists committed to tackling the fundamental challenges and open questions regarding data for AI.
         </p>
 
         {showPlaceholder && (
