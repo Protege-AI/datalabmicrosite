@@ -42,6 +42,8 @@ yarn-error.log*
 next-env.d.ts
 terminal tracking/
 zTerminal CLI Logs/
+Claude CLI History/
+Terminal Saved Output.txt
 
 # source font files (only public/fonts needed for deployment)
 /fonts/
