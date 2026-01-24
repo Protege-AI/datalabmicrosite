@@ -226,6 +226,12 @@ export default function DataCollectionGame({ onClose }: { onClose: () => void })
     keysPressed.current.clear();
   };
 
+  // Handle close
+  const handleClose = () => {
+    setGameActive(false);
+    onClose();
+  };
+
   // Handle mouse movement
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (gameRef.current && gameActive) {
@@ -238,6 +244,13 @@ export default function DataCollectionGame({ onClose }: { onClose: () => void })
 
   // Handle keyboard movement with momentum
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    // Escape key closes game at any time
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      handleClose();
+      return;
+    }
+
     // Handle game controls
     if (gameActive) {
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
@@ -270,7 +283,7 @@ export default function DataCollectionGame({ onClose }: { onClose: () => void })
         }
       }
     }
-  }, [gameActive, showNameInput, showPlayAgain, playerName, playAgainSelection]);
+  }, [gameActive, showNameInput, showPlayAgain, playerName, playAgainSelection, handleClose]);
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
@@ -532,11 +545,6 @@ export default function DataCollectionGame({ onClose }: { onClose: () => void })
       window.removeEventListener('keyup', handleKeyUp);
     };
   }, [handleMouseMove, handleKeyDown, handleKeyUp]);
-
-  const handleClose = () => {
-    setGameActive(false);
-    onClose();
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
