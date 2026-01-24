@@ -1,15 +1,22 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
-import { getNews, getResearchProjects } from '@/lib/notion';
+import { useState, useEffect } from 'react';
+import DataCollectionGame from '@/components/DataCollectionGame';
 
-// Revalidate every 60 seconds
-export const revalidate = 60;
+export default function Home() {
+  const [showGame, setShowGame] = useState(false);
+  const [news, setNews] = useState<any[]>([]);
+  const [researchProjects, setResearchProjects] = useState<any[]>([]);
 
-export default async function Home() {
-  const [news, researchProjects] = await Promise.all([
-    getNews().catch(() => []),
-    getResearchProjects().catch(() => []),
-  ]);
+  // Fetch data on client side
+  useEffect(() => {
+    // For now, use placeholder data
+    // You can implement API routes later if needed
+    setNews([]);
+    setResearchProjects([]);
+  }, []);
 
   // Use Notion data if available, otherwise show placeholder
   const displayNews = news.length > 0 ? news.slice(0, 3) : [
@@ -36,7 +43,7 @@ export default async function Home() {
   };
 
   return (
-    <div>
+    <div className="relative">
       {/* Hero Section */}
       <section className="border-b border-[var(--cloud)] py-20">
         <div className="mx-auto max-w-5xl px-6">
@@ -64,6 +71,12 @@ export default async function Home() {
                 >
                   Join Us
                 </Link>
+                <button
+                  onClick={() => setShowGame(true)}
+                  className="border border-[var(--orange)] bg-[var(--orange)] px-5 py-2.5 text-xs font-mono uppercase tracking-wide text-white hover:bg-[var(--purple)] hover:border-[var(--purple)] transition-colors"
+                >
+                  Collect Data
+                </button>
               </div>
             </div>
             <div className="relative h-auto lg:min-h-[400px] overflow-hidden flex items-center justify-center bg-[#0a0a0a]">
@@ -159,6 +172,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* Data Collection Game */}
+      {showGame && <DataCollectionGame onClose={() => setShowGame(false)} />}
     </div>
   );
 }
