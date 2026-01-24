@@ -1,36 +1,22 @@
-'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
-import DataCollectionGame from '@/components/DataCollectionGame';
-import { FEATURES } from '@/config/features';
+import { getNews, getResearchProjects } from '@/lib/notion';
+import HomeClient from '../components/HomeClient';
 
-export default function Home() {
-  const [showGame, setShowGame] = useState(false);
-  const [news, setNews] = useState<any[]>([]);
-  const [researchProjects, setResearchProjects] = useState<any[]>([]);
+// Revalidate every 60 seconds
+export const revalidate = 60;
 
-  // Fetch data on client side
-  useEffect(() => {
-    // For now, use placeholder data
-    // You can implement API routes later if needed
-    setNews([]);
-    setResearchProjects([]);
-  }, []);
+export default async function Home() {
+  const [news, researchProjects] = await Promise.all([
+    getNews().catch(() => []),
+    getResearchProjects().catch(() => []),
+  ]);
 
-  // Use Notion data if available, otherwise show placeholder
-  const displayNews = news.length > 0 ? news.slice(0, 3) : [
-    { id: '1', date: 'January 2025', title: 'New paper accepted at ICML 2025', description: 'Our work on scalable data pipelines has been accepted.' },
-    { id: '2', date: 'December 2024', title: 'Lab wins Best Paper Award', description: 'Congratulations to the team for this achievement.' },
-    { id: '3', date: 'November 2024', title: 'Welcome new PhD students', description: 'We are excited to welcome three new members to the lab.' },
-  ];
+  // Get latest 3 news items in reverse chronological order (already sorted by Notion)
+  const displayNews = news.slice(0, 3);
 
-  const displayResearch = researchProjects.length > 0 ? researchProjects.slice(0, 3) : [
-    { id: '1', title: 'Data Infrastructure', description: 'Building scalable systems for data processing and management.', tags: [] },
-    { id: '2', title: 'Machine Learning', description: 'Developing novel ML algorithms for real-world applications.', tags: [] },
-    { id: '3', title: 'Data Visualization', description: 'Creating intuitive interfaces for complex data exploration.', tags: [] },
-  ];
+  // Get latest 3 research projects
+  const displayResearch = researchProjects.slice(0, 3);
 
   // Format date for display
   const formatDate = (dateStr: string) => {
@@ -44,7 +30,7 @@ export default function Home() {
   };
 
   return (
-    <div className="relative">
+    <>
       {/* Hero Section */}
       <section className="border-b border-[var(--cloud)] py-20">
         <div className="mx-auto max-w-5xl px-6">
@@ -72,14 +58,7 @@ export default function Home() {
                 >
                   Join Us
                 </Link>
-                {FEATURES.DATA_COLLECTION_GAME && (
-                  <button
-                    onClick={() => setShowGame(true)}
-                    className="border border-[var(--orange)] bg-[var(--orange)] px-5 py-2.5 text-xs font-mono uppercase tracking-wide text-white hover:bg-[var(--purple)] hover:border-[var(--purple)] transition-colors"
-                  >
-                    Collect Data
-                  </button>
-                )}
+                <HomeClient />
               </div>
             </div>
             <div className="relative h-auto lg:min-h-[400px] overflow-hidden flex items-center justify-center bg-[#0a0a0a]">
@@ -97,41 +76,38 @@ export default function Home() {
       </section>
 
       {/* News Section */}
-      <section className="py-16">
-        <div className="mx-auto max-w-5xl px-6">
-          <h2 className="text-2xl font-mono uppercase tracking-wide text-[var(--orange)] mb-8">Latest News</h2>
-          <div className="space-y-0 divide-y divide-[var(--cloud)]/50">
-            {displayNews.map((item) => (
-              <Link
-                key={item.id}
-                href={`/news/${item.id}`}
-                className="block py-5 group"
-              >
-                <div className="flex items-baseline gap-4">
-                  <span className="font-mono text-xs text-[var(--muted)] group-hover:text-[var(--orange)] transition-colors shrink-0 w-28">{formatDate(item.date)}</span>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base text-[var(--black)] group-hover:text-[var(--orange)] transition-colors">{item.title}</h3>
-                    <p className="mt-1 text-sm text-[var(--muted)] font-light line-clamp-1 group-hover:text-[var(--orange)] transition-colors">{item.description}</p>
+      {displayNews.length > 0 && (
+        <section className="py-16">
+          <div className="mx-auto max-w-5xl px-6">
+            <h2 className="text-2xl font-mono uppercase tracking-wide text-[var(--orange)] mb-8">Latest News</h2>
+            <div className="space-y-0 divide-y divide-[var(--cloud)]/50">
+              {displayNews.map((item) => (
+                <Link
+                  key={item.id}
+                  href={`/news/${item.id}`}
+                  className="block py-5 group"
+                >
+                  <div className="flex items-baseline gap-4">
+                    <span className="font-mono text-xs text-[var(--muted)] group-hover:text-[var(--orange)] transition-colors shrink-0 w-28">{formatDate(item.date)}</span>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base text-[var(--black)] group-hover:text-[var(--orange)] transition-colors">{item.title}</h3>
+                      <p className="mt-1 text-sm text-[var(--muted)] font-light line-clamp-1 group-hover:text-[var(--orange)] transition-colors">{item.description}</p>
+                    </div>
                   </div>
-                </div>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-8">
+              <Link
+                href="/blog"
+                className="font-mono text-xs uppercase tracking-wide text-[var(--muted)] hover:text-[var(--orange)] transition-colors"
+              >
+                View all →
               </Link>
-            ))}
+            </div>
           </div>
-          {news.length === 0 && (
-            <p className="mt-4 text-sm text-[var(--muted)] font-mono">
-              // No news items yet
-            </p>
-          )}
-          <div className="mt-8">
-            <Link
-              href="/blog"
-              className="font-mono text-xs uppercase tracking-wide text-[var(--muted)] hover:text-[var(--orange)] transition-colors"
-            >
-              View all →
-            </Link>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Research Highlights */}
       <section className="border-t border-[var(--cloud)] py-16">
@@ -175,11 +151,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Data Collection Game */}
-      {FEATURES.DATA_COLLECTION_GAME && showGame && (
-        <DataCollectionGame onClose={() => setShowGame(false)} />
-      )}
-    </div>
+    </>
   );
 }
