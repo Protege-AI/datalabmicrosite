@@ -31,6 +31,11 @@ export default async function Home() {
 
   return (
     <>
+      {/* TEST BOX - REMOVE AFTER TESTING */}
+      <div className="bg-[var(--yellow)] p-8 text-center">
+        <p className="text-2xl font-mono font-bold text-[var(--black)]">TEST: Deployment is working!</p>
+      </div>
+
       {/* Hero Section */}
       <section className="border-b border-[var(--cloud)] py-20">
         <div className="mx-auto max-w-5xl px-6">
