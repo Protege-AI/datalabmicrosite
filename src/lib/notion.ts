@@ -1,5 +1,13 @@
 import { Client } from '@notionhq/client';
 
+// Validate Notion ID format (UUID with or without dashes)
+// This prevents injection attacks and invalid API calls
+const NOTION_ID_REGEX = /^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$/i;
+
+export function isValidNotionId(id: string): boolean {
+  return NOTION_ID_REGEX.test(id);
+}
+
 // Lazy initialization to ensure environment variables are loaded
 let notionClient: Client | null = null;
 
@@ -194,6 +202,11 @@ export async function getNews(): Promise<NewsItem[]> {
 
 // Fetch single news article with content
 export async function getNewsArticle(id: string): Promise<(NewsItem & { content: ContentBlock[] }) | null> {
+  // Validate ID format to prevent invalid API calls
+  if (!isValidNotionId(id)) {
+    return null;
+  }
+
   try {
     const page = await getPage(id);
 
@@ -385,6 +398,11 @@ export async function getResearchProjects(): Promise<ResearchProject[]> {
 
 // Fetch single research article with content
 export async function getResearchArticle(id: string): Promise<(ResearchProject & { content: ContentBlock[] }) | null> {
+  // Validate ID format to prevent invalid API calls
+  if (!isValidNotionId(id)) {
+    return null;
+  }
+
   try {
     const page = await getPage(id);
 
