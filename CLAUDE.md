@@ -9,7 +9,12 @@ This is the Daylab microsite - a marketing/informational website for Daylab.
 > "Are you starting new work, or continuing on an existing branch?"
 
 **If starting new work:**
-1. Run `git checkout main && git pull` to sync with latest
+1. Sync with latest main:
+   ```bash
+   git checkout main
+   git fetch origin
+   git reset --hard origin/main
+   ```
 2. Ask what they're working on
 3. Create a new branch: `git checkout -b <descriptive-branch-name>`
 
@@ -20,6 +25,8 @@ This is the Daylab microsite - a marketing/informational website for Daylab.
 **Branch naming**: Use descriptive kebab-case names (e.g., `add-contact-form`, `fix-nav-bug`)
 
 **Why this matters**: After a PR is merged, GitHub auto-deletes the branch. Starting new work on a stale/deleted branch causes issues.
+
+**Why `reset --hard` instead of `pull`**: When PRs are squash-merged on GitHub, the commit hash changes. This can cause local main to diverge from origin/main, making `git pull` fail. Using `fetch` + `reset --hard` ensures local main always matches origin exactly.
 
 ## Design Standards
 When working on any frontend code (HTML, CSS, React components, pages, layouts):
