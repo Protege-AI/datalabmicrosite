@@ -1,5 +1,10 @@
 import Image from 'next/image';
 
+export const metadata = {
+  title: 'Contact',
+  description: 'Get in touch with the Data Lab team or explore open research positions.',
+};
+
 export default function ContactPage() {
   return (
     <div className="py-16">
@@ -43,9 +48,10 @@ export default function ContactPage() {
           {/* Visual element */}
           <div className="relative aspect-square overflow-hidden border border-[var(--cloud)] hidden lg:block">
             <Image
-              src="/images/illustrations.png"
+              src="/images/illustrations.webp"
               alt="Pixelated illustrations"
               fill
+              sizes="50vw"
               className="object-cover object-[100%_100%] scale-150"
             />
           </div>

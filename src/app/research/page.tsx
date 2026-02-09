@@ -1,32 +1,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getResearchProjects } from '@/lib/notion';
+import { nameToSlug, formatDate, isNotionImage } from '@/lib/utils';
+import { getArticleTypeColor } from '@/lib/constants';
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
-// Color mapping for article types
-const articleTypeColors: Record<string, string> = {
-  'Research Paper': 'text-[var(--pro-indigo)]',
-  'Case Study': 'text-[var(--blue)]',
-  'Technical Report': 'text-[var(--purple)]',
-  'Blog Post': 'text-[var(--orange)]',
-  'White Paper': 'text-[var(--sky)]',
-  'Tutorial': 'text-[var(--yellow)]',
-  'Analysis': 'text-[var(--sand)]',
-};
-
-const getArticleTypeColor = (articleType: string): string => {
-  return articleTypeColors[articleType] || 'text-[var(--muted)]';
-};
-
-const formatDate = (dateStr: string): string => {
-  if (!dateStr) return '';
-  try {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  } catch {
-    return dateStr;
-  }
+export const metadata = {
+  title: 'Research',
+  description: 'Research, ideas, and publications that explore AI\'s data frontier.',
 };
 
 export default async function ResearchPage() {
@@ -45,9 +27,10 @@ export default async function ResearchPage() {
           </div>
           <div className="relative h-48 overflow-hidden border border-[var(--cloud)]">
             <Image
-              src="/images/illustrations.png"
+              src="/images/illustrations.webp"
               alt="Abstract illustrations"
               fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover object-[0%_0%]"
               priority
             />
@@ -80,6 +63,7 @@ export default async function ResearchPage() {
                         width={200}
                         height={120}
                         className="object-contain max-h-[120px] w-auto"
+                        unoptimized={isNotionImage(project.previewImage)}
                       />
                     </div>
                   )}
@@ -90,10 +74,10 @@ export default async function ResearchPage() {
                       <p className="mt-1 text-xs text-[var(--muted)] font-light">
                         by{' '}
                         <Link
-                          href="/people"
+                          href={`/people?person=${nameToSlug(project.authors?.split(',')[0]?.trim() || 'data-lab')}`}
                           className="relative z-10 hover:text-[var(--pro-indigo)] transition-colors"
                         >
-                          {project.authors || 'Protege Data Lab'}
+                          {project.authors || 'Data Lab'}
                         </Link>
                       </p>
                       <p className="mt-2 text-sm text-[var(--muted)] font-light">{project.description}</p>
@@ -117,7 +101,7 @@ export default async function ResearchPage() {
                     </div>
                     <div className="shrink-0 sm:text-right flex sm:flex-col gap-2 sm:gap-0 mt-2 sm:mt-0">
                       {project.articleType && (
-                        <span className={`font-mono text-xs ${getArticleTypeColor(project.articleType)}`}>
+                        <span className={`font-mono text-xs ${getArticleTypeColor(project.articleType).text}`}>
                           {project.articleType}
                         </span>
                       )}

@@ -3,8 +3,7 @@
 /* Suisse Int'l Mono - Headers */
 @font-face {
   font-family: 'Suisse Intl Mono';
-  src: url('/fonts/SuisseIntlMono-Regular-WebXL.woff2') format('woff2'),
-       url('/fonts/SuisseIntlMono-Regular-WebXL.woff') format('woff');
+  src: url('/fonts/SuisseIntlMono-Regular-WebXL.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -13,8 +12,7 @@
 /* Plain - Body Text */
 @font-face {
   font-family: 'Plain';
-  src: url('/fonts/Plain-Light.woff2') format('woff2'),
-       url('/fonts/Plain-Light.woff') format('woff');
+  src: url('/fonts/Plain-Light.woff2') format('woff2');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
@@ -22,8 +20,7 @@
 
 @font-face {
   font-family: 'Plain';
-  src: url('/fonts/Plain-Regular.woff2') format('woff2'),
-       url('/fonts/Plain-Regular.woff') format('woff');
+  src: url('/fonts/Plain-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -75,4 +72,38 @@ h1, h2, h3, h4, h5, h6 {
 /* Monospace for code-like elements */
 code, pre, .mono {
   font-family: var(--font-mono);
+}
+
+/* Modal animations */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-down {
+  animation: slide-down 0.15s ease-out;
 }

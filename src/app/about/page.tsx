@@ -1,12 +1,17 @@
 import Link from 'next/link';
 
+export const metadata = {
+  title: 'About',
+  description: 'We tackle the fundamental challenges in data for AI — building high-value datasets, leading data research, and partnering with foundation model teams.',
+};
+
 export default function AboutPage() {
   return (
     <div className="py-16">
       <div className="mx-auto max-w-5xl px-6">
-        <h1 className="text-3xl tracking-tight text-[var(--black)]">About the Protege Data Lab</h1>
+        <h1 className="text-3xl tracking-tight text-[var(--black)]">About the Data Lab</h1>
         <p className="mt-6 max-w-2xl text-lg text-[var(--muted)] font-light leading-relaxed">
-          The Protege Data Lab exists because truly useful data is rare—yet the frontier of AI development only moves forward when high-quality data makes it possible.
+          The Data Lab exists because truly useful data is rare—yet the frontier of AI development only moves forward when high-quality data makes it possible.
         </p>
 
         <div className="mt-10 pt-8 border-t border-[var(--cloud)] max-w-2xl space-y-6">
@@ -79,10 +84,15 @@ export default function AboutPage() {
         <section className="mt-10 pt-6 border-t border-[var(--cloud)]">
           <h2 className="text-lg font-mono uppercase tracking-wide text-[var(--muted)] mb-4">Join Us</h2>
           <p className="text-[var(--muted)] font-light leading-relaxed max-w-2xl">
-            Interested in our mission? Visit our{' '}
+            Interested in our mission? Learn about{' '}
+            <Link href="/people" className="text-[var(--pro-indigo)] hover:underline">
+              our people
+            </Link>{' '}
+            or visit our{' '}
             <Link href="/contact" className="text-[var(--pro-indigo)] hover:underline">
               contact page
-            </Link>.
+            </Link>{' '}
+            to get in touch.
           </p>
         </section>
       </div>

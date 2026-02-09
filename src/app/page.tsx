@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { getNews, getResearchProjects } from '@/lib/notion';
+import { formatDate, isNotionImage } from '@/lib/utils';
 import HomeClient from '../components/HomeClient';
+import PixelGrid from '../components/PixelGrid';
 
-// Revalidate every 60 seconds
-export const revalidate = 60;
+// Revalidate every 5 minutes
+export const revalidate = 300;
 
 export default async function Home() {
   const [news, researchProjects] = await Promise.all([
@@ -18,58 +20,36 @@ export default async function Home() {
   // Get latest 3 research projects
   const displayResearch = researchProjects.slice(0, 3);
 
-  // Format date for display
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return '';
-    try {
-      const date = new Date(dateStr);
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    } catch {
-      return dateStr;
-    }
-  };
-
   return (
     <>
       {/* Hero Section */}
-      <section className="border-b border-[var(--cloud)] py-20">
-        <div className="mx-auto max-w-5xl px-6">
-          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-            <div>
-              <h1 className="text-4xl tracking-tight text-[var(--black)] sm:text-5xl">
-                Welcome to the Protege Data Lab
-              </h1>
-              <p className="mt-6 text-lg text-[var(--muted)] font-light leading-relaxed">
-                We are a team of research scientists committed to tackling the fundamental
-                challenges and open questions regarding data for AI. We're committed to
-                bridging the gap between research theory and data deployment to push the
-                frontier forward.
-              </p>
-              <div className="mt-8 flex gap-3">
-                <Link
-                  href="/about"
-                  className="border border-[var(--black)] bg-[var(--black)] px-5 py-2.5 text-xs font-mono uppercase tracking-wide text-white hover:bg-[var(--pro-indigo)] hover:border-[var(--pro-indigo)] transition-colors"
-                >
-                  Learn More
-                </Link>
-                <Link
-                  href="/contact"
-                  className="border border-[var(--cloud)] px-5 py-2.5 text-xs font-mono uppercase tracking-wide text-[var(--muted)] hover:border-[var(--pro-indigo)] hover:text-[var(--pro-indigo)] transition-colors"
-                >
-                  Join Us
-                </Link>
-                <HomeClient />
-              </div>
-            </div>
-            <div className="relative h-auto lg:min-h-[400px] overflow-hidden flex items-center justify-center bg-[#0a0a0a]">
-              <Image
-                src="/images/data-visualization-2.png"
-                alt="Scatter graph showing AI model comparisons"
-                width={667}
-                height={763}
-                className="w-full h-auto max-h-[500px] object-contain"
-                priority
-              />
+      <section className="relative overflow-hidden border-b border-[var(--cloud)]">
+        <PixelGrid />
+        <div className="relative z-10 mx-auto max-w-5xl px-6 pt-12 pb-20 sm:pt-16 sm:pb-28 lg:pt-20 lg:pb-36">
+          <div className="max-w-2xl">
+            <h1 className="text-4xl tracking-tight text-[var(--black)] sm:text-5xl">
+              Welcome to the Data Lab
+            </h1>
+            <p className="mt-6 text-lg text-[var(--muted)] font-light leading-relaxed">
+              We are a team of research scientists committed to tackling the fundamental
+              challenges and open questions regarding data for AI. We&apos;re committed to
+              bridging the gap between research theory and data deployment to push the
+              frontier forward.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href="/about"
+                className="border border-[var(--black)] bg-[var(--black)] px-5 py-2.5 text-xs font-mono uppercase tracking-wide text-white hover:bg-[var(--pro-indigo)] hover:border-[var(--pro-indigo)] transition-colors"
+              >
+                Learn More
+              </Link>
+              <Link
+                href="/contact"
+                className="border border-[var(--cloud)] px-5 py-2.5 text-xs font-mono uppercase tracking-wide text-[var(--muted)] hover:border-[var(--pro-indigo)] hover:text-[var(--pro-indigo)] transition-colors"
+              >
+                Join Us
+              </Link>
+              <HomeClient />
             </div>
           </div>
         </div>
@@ -79,7 +59,7 @@ export default async function Home() {
       {displayNews.length > 0 && (
         <section className="py-16">
           <div className="mx-auto max-w-5xl px-6">
-            <Link href="/blog" className="text-2xl font-mono uppercase tracking-wide text-[var(--orange)] hover:text-[var(--orange)]/70 transition-colors mb-8 block">Latest News</Link>
+            <h2><Link href="/blog" className="text-2xl font-mono uppercase tracking-wide text-[var(--orange)] hover:text-[var(--orange)]/70 transition-colors mb-8 block">Latest News</Link></h2>
             <div className="space-y-0 divide-y divide-[var(--cloud)]/50">
               {displayNews.map((item) => (
                 <Link
@@ -87,11 +67,11 @@ export default async function Home() {
                   href={`/news/${item.id}`}
                   className="block py-5 group"
                 >
-                  <div className="flex items-baseline gap-4">
-                    <span className="font-mono text-xs text-[var(--muted)] group-hover:text-[var(--orange)] transition-colors shrink-0 w-28">{formatDate(item.date)}</span>
+                  <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4">
+                    <time dateTime={item.date} className="font-mono text-xs text-[var(--muted)] group-hover:text-[var(--orange)] transition-colors shrink-0 sm:w-28">{formatDate(item.date)}</time>
                     <div className="flex-1 min-w-0">
                       <h3 className="text-base text-[var(--black)] group-hover:text-[var(--orange)] transition-colors">{item.title}</h3>
-                      <p className="mt-1 text-sm text-[var(--muted)] font-light line-clamp-1 group-hover:text-[var(--orange)] transition-colors">{item.description}</p>
+                      <p className="mt-1 text-sm text-[var(--muted)] font-light line-clamp-1 group-hover:text-[var(--orange)] transition-colors hidden sm:block">{item.description}</p>
                     </div>
                   </div>
                 </Link>
@@ -112,7 +92,7 @@ export default async function Home() {
       {/* Research Highlights */}
       <section className="border-t border-[var(--cloud)] py-16">
         <div className="mx-auto max-w-5xl px-6">
-          <Link href="/research" className="text-2xl font-mono uppercase tracking-wide text-[var(--purple)] hover:text-[var(--purple)]/70 transition-colors mb-8 block">Research</Link>
+          <h2><Link href="/research" className="text-2xl font-mono uppercase tracking-wide text-[var(--purple)] hover:text-[var(--purple)]/70 transition-colors mb-8 block">Research</Link></h2>
 
           <div className="grid gap-6 md:grid-cols-3">
             {displayResearch.map((item) => (
@@ -128,7 +108,9 @@ export default async function Home() {
                       src={item.previewImage}
                       alt={item.title}
                       fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
                       className="object-cover"
+                      unoptimized={isNotionImage(item.previewImage)}
                     />
                   </div>
                 )}

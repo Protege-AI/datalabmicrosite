@@ -1,7 +1,13 @@
 import { getPeople, Person } from '@/lib/notion';
-import PersonCard from '@/components/PersonCard';
+import PeoplePageClient from '@/components/PeoplePageClient';
+import Image from 'next/image';
 
-export const revalidate = 60;
+export const revalidate = 300;
+
+export const metadata = {
+  title: 'People',
+  description: 'Meet the research scientists behind Data Lab — our team of experts in econometrics, machine learning, measurement theory, and healthcare data.',
+};
 
 export default async function PeoplePage() {
   const people = await getPeople().catch(() => []);
@@ -19,13 +25,29 @@ export default async function PeoplePage() {
     { id: '4', name: 'Sarah Tucker', role: 'Researcher', bio: 'Columbia University trained. Qualitative and quantitative researcher with healthcare data experience (formerly at Datavant)', order: 4 },
   ];
 
+  const displayTeam = showPlaceholder ? placeholderTeam : team;
+
   return (
     <div className="py-16">
       <div className="mx-auto max-w-5xl px-6">
-        <h1 className="text-3xl tracking-tight text-[var(--black)]">People</h1>
-        <p className="mt-3 text-[var(--muted)] font-light">
-          We are a team of research scientists committed to tackling the fundamental challenges and open questions regarding data for AI.
-        </p>
+        <div className="flex flex-col md:flex-row md:items-center md:gap-10 mb-10">
+          <div className="md:w-2/3">
+            <h1 className="text-3xl tracking-tight text-[var(--black)]">People</h1>
+            <p className="mt-3 text-[var(--muted)] font-light">
+              We are a team of research scientists committed to tackling the fundamental challenges and open questions regarding data for AI.
+            </p>
+          </div>
+          <div className="mt-6 md:mt-0 md:w-1/3">
+            <Image
+              src="/images/data-lab-offsite-feb-2026.png"
+              alt="Data Lab team at the February 2026 offsite"
+              width={1200}
+              height={800}
+              className="w-full rounded-lg"
+              priority
+            />
+          </div>
+        </div>
 
         {showPlaceholder && (
           <p className="mt-4 font-mono text-sm text-[var(--muted)]">
@@ -33,30 +55,11 @@ export default async function PeoplePage() {
           </p>
         )}
 
-        {/* Team */}
-        <section className="mt-14">
-          <h2 className="text-xs font-mono uppercase tracking-wide text-[var(--muted)] mb-6">Team</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            {(showPlaceholder ? placeholderTeam : team).map((person) => (
-              <PersonCard key={person.id} person={person} />
-            ))}
-          </div>
-        </section>
-
-        {/* Alumni */}
-        {(alumni.length > 0 || showPlaceholder) && (
-          <section className="mt-14">
-            <h2 className="text-xs font-mono uppercase tracking-wide text-[var(--muted)] mb-6">Alumni</h2>
-            <div className="grid gap-4 md:grid-cols-2">
-              {alumni.map((person) => (
-                <PersonCard key={person.id} person={person} />
-              ))}
-            </div>
-            {alumni.length === 0 && showPlaceholder && (
-              <p className="font-mono text-sm text-[var(--muted)]">// No alumni yet</p>
-            )}
-          </section>
-        )}
+        <PeoplePageClient
+          team={displayTeam}
+          alumni={alumni}
+          showPlaceholder={showPlaceholder}
+        />
       </div>
     </div>
   );

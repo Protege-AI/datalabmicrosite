@@ -19,16 +19,16 @@ export default function Navigation() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[var(--cloud)] bg-white">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-6">
-        <Link href="/" className="font-mono text-sm tracking-tight text-[var(--black)] uppercase hover:text-[var(--pro-indigo)] transition-colors cursor-pointer z-10">
-          Protege Data Lab
+        <Link href="/" className="font-mono text-sm tracking-tight text-[var(--black)] uppercase hover:text-[var(--pro-indigo)] transition-colors cursor-pointer z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pro-indigo)]">
+          Data Lab by Protege
         </Link>
         <nav className="hidden md:flex items-center gap-6">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={`font-mono text-xs uppercase tracking-wide transition-colors hover:text-[var(--pro-indigo)] ${
-                pathname === item.href ? 'text-[var(--pro-indigo)]' : 'text-[var(--muted)]'
+              className={`font-mono text-xs uppercase tracking-wide transition-colors hover:text-[var(--pro-indigo)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pro-indigo)] ${
+                pathname.startsWith(item.href) ? 'text-[var(--pro-indigo)]' : 'text-[var(--muted)]'
               }`}
             >
               {item.label}
@@ -36,7 +36,7 @@ export default function Navigation() {
           ))}
         </nav>
         <button
-          className="md:hidden p-2 text-[var(--muted)]"
+          className="md:hidden p-3 -mr-1 text-[var(--muted)]"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileMenuOpen}
@@ -53,15 +53,15 @@ export default function Navigation() {
         </button>
       </div>
       {mobileMenuOpen && (
-        <nav className="md:hidden border-t border-[var(--cloud)] bg-white">
-          <div className="mx-auto max-w-5xl px-6 py-4 flex flex-col gap-4">
+        <nav className="md:hidden border-t border-[var(--cloud)] bg-white animate-slide-down">
+          <div className="mx-auto max-w-5xl px-6 py-2 flex flex-col">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`font-mono text-sm uppercase tracking-wide transition-colors hover:text-[var(--pro-indigo)] ${
-                  pathname === item.href ? 'text-[var(--pro-indigo)]' : 'text-[var(--muted)]'
+                className={`font-mono text-sm uppercase tracking-wide transition-colors hover:text-[var(--pro-indigo)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pro-indigo)] py-3 ${
+                  pathname.startsWith(item.href) ? 'text-[var(--pro-indigo)]' : 'text-[var(--muted)]'
                 }`}
               >
                 {item.label}
