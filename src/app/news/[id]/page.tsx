@@ -1,8 +1,13 @@
+import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getNewsArticle, getNews, ContentBlock } from '@/lib/notion';
+import { getNewsArticle, getNews } from '@/lib/notion';
+import { ArticleContent } from '@/components/BlockRenderer';
+import { formatDate } from '@/lib/utils';
 
-export const revalidate = 60;
+export const revalidate = 3600;
+
+const getCachedNewsArticle = cache(getNewsArticle);
 
 // Generate static paths for all news articles
 export async function generateStaticParams() {
@@ -12,46 +17,29 @@ export async function generateStaticParams() {
   }));
 }
 
-// Render a content block
-function BlockRenderer({ block }: { block: ContentBlock }) {
-  switch (block.type) {
-    case 'heading_1':
-      return <h1 className="text-2xl text-[var(--black)] mt-10 mb-4">{block.content}</h1>;
-    case 'heading_2':
-      return <h2 className="text-xl text-[var(--black)] mt-8 mb-3">{block.content}</h2>;
-    case 'heading_3':
-      return <h3 className="text-lg text-[var(--black)] mt-6 mb-2">{block.content}</h3>;
-    case 'paragraph':
-      return block.content ? (
-        <p className="text-[var(--muted)] font-light leading-relaxed mb-5">{block.content}</p>
-      ) : (
-        <div className="h-5" />
-      );
-    case 'bulleted_list_item':
-      return (
-        <li className="text-[var(--muted)] font-light ml-5 mb-2 list-disc">{block.content}</li>
-      );
-    case 'numbered_list_item':
-      return (
-        <li className="text-[var(--muted)] font-light ml-5 mb-2 list-decimal">{block.content}</li>
-      );
-    case 'quote':
-      return (
-        <blockquote className="border-l border-[var(--pro-indigo)]/30 pl-5 py-1 my-6 text-[var(--muted)] font-light italic">
-          {block.content}
-        </blockquote>
-      );
-    case 'callout':
-      return (
-        <div className="border border-[var(--cloud)] bg-[var(--powder)]/10 p-4 my-6">
-          <p className="text-[var(--muted)] font-light">{block.content}</p>
-        </div>
-      );
-    case 'divider':
-      return <hr className="my-10 border-[var(--cloud)]" />;
-    default:
-      return null;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const article = await getCachedNewsArticle(id);
+
+  if (!article) {
+    return { title: 'Blog' };
   }
+
+  return {
+    title: article.title,
+    description: article.description,
+    openGraph: {
+      title: article.title,
+      description: article.description,
+      type: 'article',
+      ...(article.date && { publishedTime: article.date }),
+      ...(article.author?.name && { authors: [article.author.name] }),
+    },
+  };
 }
 
 export default async function NewsArticlePage({
@@ -60,25 +48,11 @@ export default async function NewsArticlePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const article = await getNewsArticle(id);
+  const article = await getCachedNewsArticle(id);
 
   if (!article) {
     notFound();
   }
-
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return '';
-    try {
-      const date = new Date(dateStr);
-      return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      });
-    } catch {
-      return dateStr;
-    }
-  };
 
   return (
     <div className="py-16">
@@ -94,7 +68,7 @@ export default async function NewsArticlePage({
         {/* Article header */}
         <header className="mb-10">
           <div className="flex items-center gap-3 font-mono text-xs text-[var(--muted)] mb-4">
-            <time>{formatDate(article.date)}</time>
+            <time dateTime={article.date}>{formatDate(article.date)}</time>
             {article.author && (
               <>
                 <span>/</span>
@@ -115,9 +89,7 @@ export default async function NewsArticlePage({
         {/* Article content */}
         <article>
           {article.content.length > 0 ? (
-            article.content.map((block) => (
-              <BlockRenderer key={block.id} block={block} />
-            ))
+            <ArticleContent blocks={article.content} />
           ) : (
             <p className="font-mono text-sm text-[var(--muted)]">
               // Content coming soon

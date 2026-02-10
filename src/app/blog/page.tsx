@@ -1,8 +1,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { getNews } from '@/lib/notion';
+import { formatDate } from '@/lib/utils';
 
-export const revalidate = 60;
+export const revalidate = 3600;
+
+export const metadata = {
+  title: 'Blog',
+  description: 'News, insights, and updates from the Data Lab on data science, AI training data, and evaluation benchmarks.',
+};
 
 export default async function BlogPage() {
   const articles = await getNews().catch((error) => {
@@ -10,29 +16,16 @@ export default async function BlogPage() {
     return [];
   });
 
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return '';
-    try {
-      const date = new Date(dateStr);
-      return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      });
-    } catch {
-      return dateStr;
-    }
-  };
-
   return (
     <div className="py-16">
       <div className="mx-auto max-w-5xl px-6">
         {/* Header with image */}
-        <div className="relative h-48 mb-10 overflow-hidden border border-[var(--cloud)]">
+        <div className="relative h-32 sm:h-48 mb-10 overflow-hidden border border-[var(--cloud)]">
           <Image
-            src="/images/photography-collage.png"
+            src="/images/photography-collage.webp"
             alt="Research and collaboration"
             fill
+            sizes="(max-width: 1024px) 100vw, 1024px"
             className="object-cover object-[50%_75%]"
             priority
           />
@@ -42,7 +35,7 @@ export default async function BlogPage() {
           </div>
         </div>
         <p className="text-[var(--muted)] font-light">
-          News, insights, and updates from the Protege Data Lab.
+          News, insights, and updates from the Data Lab.
         </p>
 
         {articles.length === 0 ? (
@@ -59,7 +52,7 @@ export default async function BlogPage() {
               >
                 <article>
                   <div className="flex items-center gap-3 text-xs font-mono text-[var(--muted)]">
-                    <time>{formatDate(article.date)}</time>
+                    <time dateTime={article.date}>{formatDate(article.date)}</time>
                     {article.author && (
                       <>
                         <span>/</span>

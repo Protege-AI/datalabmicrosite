@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import DataCollectionGame from './DataCollectionGame';
+import dynamic from 'next/dynamic';
 import { FEATURES } from '@/config/features';
+
+const DataCollectionGame = dynamic(() => import('./DataCollectionGame'), { ssr: false });
 
 export default function HomeClient() {
   const [showGame, setShowGame] = useState(false);
